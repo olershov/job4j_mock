@@ -105,7 +105,7 @@
                                 </small>
                             </td>
                             <td>
-                                <span class="badge bg-success">Новых: 100</span>
+                                <span class="badge bg-success"  th:text="${interviews_count.get(category.id) == null} ? 'Новых: 0' : |Новых: ${interviews_count.get(category.id)}|"></span>
                             </td>
                         </tr>
                         </tbody>

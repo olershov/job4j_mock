@@ -56,7 +56,7 @@ class IndexControllerTest {
     @BeforeEach
     void initTest() {
         this.indexController = new IndexController(
-                categoriesService, interviewsService, authService, notificationService, profilesService
+                categoriesService, interviewsService, authService, notificationService, profilesService, topicsService
         );
     }
 
@@ -78,6 +78,8 @@ class IndexControllerTest {
         topicDTO2.setName("topic2");
         var cat1 = new CategoryDTO(1, "name1");
         var cat2 = new CategoryDTO(2, "name2");
+        topicDTO1.setCategory(cat1);
+        topicDTO2.setCategory(cat2);
         var listCat = List.of(cat1, cat2);
         var firstInterview = new InterviewDTO(1, 1, 1, 1,
                 "interview1", "description1", "contact1",
@@ -90,6 +92,8 @@ class IndexControllerTest {
         when(topicsService.getByCategory(cat2.getId())).thenReturn(List.of(topicDTO2));
         when(categoriesService.getMostPopular()).thenReturn(listCat);
         when(interviewsService.getByType(1)).thenReturn(listInterviews);
+        when(topicsService.getById(1)).thenReturn(topicDTO1);
+        when(topicsService.getById(2)).thenReturn(topicDTO2);
         var listBread = List.of(new Breadcrumb("Главная", "/"));
         var model = new ConcurrentModel();
         var view = indexController.getIndexPage(model, null);
