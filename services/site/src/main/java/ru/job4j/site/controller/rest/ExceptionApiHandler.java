@@ -1,0 +1,26 @@
+package ru.job4j.site.controller.rest;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.job4j.site.exception.IdNotFoundException;
+import ru.job4j.site.domain.ErrorMessage;
+
+/**
+ * CheckDev пробное собеседование
+ * ExceptionApiHandler класс для обработки исключений
+ *
+ * @author Oleg Ershov
+ * @version 07.01.2024 19:26
+ */
+@RestControllerAdvice
+public class ExceptionApiHandler {
+
+    @ExceptionHandler(IdNotFoundException.class)
+    public ResponseEntity<ErrorMessage> notFoundException(IdNotFoundException exception) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(new ErrorMessage(exception.getMessage()));
+    }
+}
