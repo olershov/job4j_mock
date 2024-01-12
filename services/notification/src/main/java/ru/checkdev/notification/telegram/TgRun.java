@@ -7,9 +7,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-import ru.checkdev.notification.telegram.action.Action;
-import ru.checkdev.notification.telegram.action.InfoAction;
-import ru.checkdev.notification.telegram.action.RegAction;
+import ru.checkdev.notification.telegram.action.*;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
 
 import java.util.List;
@@ -43,8 +41,17 @@ public class TgRun {
     public void initTg() {
         Map<String, Action> actionMap = Map.of(
                 "/start", new InfoAction(List.of(
-                        "/start", "/new")),
-                "/new", new RegAction(tgAuthCallWebClint, urlSiteAuth)
+                        "/start - команды бота",
+                        "/new - регистрация нового пользователя",
+                        "/check - информация об аккаунте",
+                        "/forget - восстановление пароля",
+                        "/subscribe - подписка",
+                        "/unsubscribe - отписка")),
+                "/new", new RegAction(tgAuthCallWebClint, urlSiteAuth),
+                "/check", new CheckAction(),
+                "/forget", new ForgetAction(tgAuthCallWebClint),
+                "/subscribe", new SubscribeAction(),
+                "/unsubscribe", new UnsubscribeAction()
         );
         try {
             BotMenu menu = new BotMenu(actionMap, username, token);
