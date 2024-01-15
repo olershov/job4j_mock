@@ -17,6 +17,7 @@ import java.util.List;
 public class PersonDTO {
     private String email;
     private String password;
+    private String username;
     private boolean privacy;
     private List<RoleDTO> roles;
     private Calendar created;

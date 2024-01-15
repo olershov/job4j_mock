@@ -37,6 +37,16 @@ public class TgConfig {
     }
 
     /**
+     * Метод проверяет входящую строку на соответствие формату ввода данных username/email
+     *
+     * @param data String
+     * @return boolean
+     */
+    public boolean checkFormat(String data) {
+        return data.contains("/") && !data.startsWith("/") && !data.endsWith("/");
+    }
+
+    /**
      * метод генерирует пароль для пользователя
      *
      * @return String

@@ -19,6 +19,27 @@ class TgConfigTest {
     private final TgConfig tgConfig = new TgConfig(prefix, passSize);
 
     @Test
+    void whenValidDataThenReturnTrue() {
+        var data = "username/mail@mail.ru";
+        var actual = tgConfig.checkFormat(data);
+        assertThat(actual).isTrue();
+    }
+
+    @Test
+    void whenNameIsEmptyThenReturnFalse() {
+        var data = "/mail@mail.ru";
+        var actual = tgConfig.checkFormat(data);
+        assertThat(actual).isFalse();
+    }
+
+    @Test
+    void whenInvalidDataThenReturnFalse() {
+        var data = "username mail@mail.ru";
+        var actual = tgConfig.checkFormat(data);
+        assertThat(actual).isFalse();
+    }
+
+    @Test
     void whenIsEmailThenReturnTrue() {
         var email = "mail@mail.ru";
         var actual = tgConfig.isEmail(email);
@@ -46,10 +67,11 @@ class TgConfigTest {
 
     @Test
     void whenGetObjectToMapThenReturnObjectMap() {
-        var personDto = new PersonDTO("mail", "pass", true, null, Calendar.getInstance());
+        var personDto = new PersonDTO("mail", "pass", "name", true, null, Calendar.getInstance());
         var map = tgConfig.getObjectToMap(personDto);
         assertThat(map.get("email")).isEqualTo(personDto.getEmail());
         assertThat(map.get("password")).isEqualTo(personDto.getPassword());
+        assertThat(map.get("username")).isEqualTo(personDto.getUsername());
         assertThat(String.valueOf(map.get("privacy"))).isEqualTo(String.valueOf(true));
     }
 }

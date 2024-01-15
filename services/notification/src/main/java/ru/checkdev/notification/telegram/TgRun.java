@@ -7,9 +7,9 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
+import ru.checkdev.notification.service.ChatIdService;
 import ru.checkdev.notification.telegram.action.*;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
-
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +26,7 @@ import java.util.Map;
 @Slf4j
 public class TgRun {
     private final TgAuthCallWebClint tgAuthCallWebClint;
+    private final ChatIdService chatIdService;
     @Value("${tg.username}")
     private String username;
     @Value("${tg.token}")
@@ -33,8 +34,9 @@ public class TgRun {
     @Value("${server.site.url.login}")
     private String urlSiteAuth;
 
-    public TgRun(TgAuthCallWebClint tgAuthCallWebClint) {
+    public TgRun(TgAuthCallWebClint tgAuthCallWebClint, ChatIdService chatIdService) {
         this.tgAuthCallWebClint = tgAuthCallWebClint;
+        this.chatIdService = chatIdService;
     }
 
     @Bean
@@ -47,7 +49,7 @@ public class TgRun {
                         "/forget - восстановление пароля",
                         "/subscribe - подписка",
                         "/unsubscribe - отписка")),
-                "/new", new RegAction(tgAuthCallWebClint, urlSiteAuth),
+                "/new", new RegAction(tgAuthCallWebClint, urlSiteAuth, chatIdService),
                 "/check", new CheckAction(),
                 "/forget", new ForgetAction(tgAuthCallWebClint),
                 "/subscribe", new SubscribeAction(),
