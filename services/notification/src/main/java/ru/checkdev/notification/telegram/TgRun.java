@@ -50,7 +50,7 @@ public class TgRun {
                         "/subscribe - подписка",
                         "/unsubscribe - отписка")),
                 "/new", new RegAction(tgAuthCallWebClint, urlSiteAuth, chatIdService),
-                "/check", new CheckAction(),
+                "/check", new CheckAction(chatIdService),
                 "/forget", new ForgetAction(tgAuthCallWebClint),
                 "/subscribe", new SubscribeAction(),
                 "/unsubscribe", new UnsubscribeAction()

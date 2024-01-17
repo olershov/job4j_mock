@@ -31,14 +31,14 @@ public class RegAction implements Action {
 
     @Override
     public BotApiMethod<Message> handle(Message message) {
-        var chatId = message.getChatId().toString();
-        String text;
-        if (chatIdService.findByChatId(chatId).isPresent()) {
+        var chatIdNumber = message.getChatId().toString();
+        var text = "";
+        if (chatIdService.findByChatId(chatIdNumber).isPresent()) {
             text = "Данный аккаунт Telegram уже зарегистрирован на сайте";
-            return new SendMessage(chatId, text);
+            return new SendMessage(chatIdNumber, text);
         }
         text = "Введите ваше имя и email для регистрации в формате \"имя/email\":";
-        return new SendMessage(chatId, text);
+        return new SendMessage(chatIdNumber, text);
     }
 
     /**
