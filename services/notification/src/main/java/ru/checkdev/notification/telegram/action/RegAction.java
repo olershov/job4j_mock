@@ -24,7 +24,7 @@ import java.util.Calendar;
 public class RegAction implements Action {
     private static final String ERROR_OBJECT = "error";
     private static final String URL_AUTH_REGISTRATION = "/registration";
-    private final TgConfig tgConfig = new TgConfig("tg/", 8);
+    private final TgConfig tgConfig;
     private final TgAuthCallWebClint authCallWebClint;
     private final String urlSiteAuth;
     private final ChatIdService chatIdService;

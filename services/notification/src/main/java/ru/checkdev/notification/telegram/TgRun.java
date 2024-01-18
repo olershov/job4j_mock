@@ -9,6 +9,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 import ru.checkdev.notification.service.ChatIdService;
 import ru.checkdev.notification.telegram.action.*;
+import ru.checkdev.notification.telegram.config.TgConfig;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ import java.util.Map;
 public class TgRun {
     private final TgAuthCallWebClint tgAuthCallWebClint;
     private final ChatIdService chatIdService;
+    private final TgConfig tgConfig = new TgConfig();
     @Value("${tg.username}")
     private String username;
     @Value("${tg.token}")
@@ -49,9 +51,9 @@ public class TgRun {
                         "/forget - восстановление пароля",
                         "/subscribe - подписка",
                         "/unsubscribe - отписка")),
-                "/new", new RegAction(tgAuthCallWebClint, urlSiteAuth, chatIdService),
+                "/new", new RegAction(tgConfig, tgAuthCallWebClint, urlSiteAuth, chatIdService),
                 "/check", new CheckAction(chatIdService),
-                "/forget", new ForgetAction(tgAuthCallWebClint),
+                "/forget", new ForgetAction(tgAuthCallWebClint, tgConfig, chatIdService),
                 "/subscribe", new SubscribeAction(),
                 "/unsubscribe", new UnsubscribeAction()
         );

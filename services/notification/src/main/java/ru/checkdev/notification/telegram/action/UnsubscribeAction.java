@@ -3,6 +3,12 @@ package ru.checkdev.notification.telegram.action;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.objects.Message;
 
+/**
+ * Класс реализует пункт отписки от уведомлений в телеграм бот
+ *
+ * @author Oleg Ershov
+ * @since 17.01.24
+ */
 public class UnsubscribeAction implements Action {
 
     @Override

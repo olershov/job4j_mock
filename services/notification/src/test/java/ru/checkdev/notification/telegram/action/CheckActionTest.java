@@ -37,7 +37,7 @@ public class CheckActionTest {
         Message message = mock(Message.class);
         when(message.getChatId()).thenReturn(chatId);
         when(chatIdService.findByChatId(chatIdString)).thenReturn(Optional.empty());
-        assertThat(checkAction.handle(message)).isEqualTo(new SendMessage(chatIdString, response));
+        assertThat(checkAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class CheckActionTest {
         when(message.getChatId()).thenReturn(chatId);
         ChatId chatIdModel = new ChatId(1, chatIdString, username, email);
         when(chatIdService.findByChatId(chatIdString)).thenReturn(Optional.of(chatIdModel));
-        assertThat(checkAction.handle(message)).isEqualTo(new SendMessage(chatIdString, response));
+        assertThat(checkAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
     }
 
 }

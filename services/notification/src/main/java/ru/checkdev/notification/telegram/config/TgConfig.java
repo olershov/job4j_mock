@@ -25,6 +25,11 @@ public class TgConfig {
         this.passSize = passSize;
     }
 
+    public TgConfig() {
+        this.prefix = "tg/";
+        this.passSize = 8;
+    }
+
     /**
      * Метод проверяет входящую строку на соответствие формату email
      *
