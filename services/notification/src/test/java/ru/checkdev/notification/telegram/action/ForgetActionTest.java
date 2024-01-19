@@ -15,15 +15,14 @@ import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
 import java.util.Map;
 import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.*;
 
 /**
  * Testing ForgetAction class
  *
  * @author Oleg Ershov
- * @since 17.01.2024
+ * @since 20.01.2024
  */
 
 @ExtendWith(MockitoExtension.class)
@@ -42,24 +41,58 @@ class ForgetActionTest {
 
     @Test
     public void whenAccountNotExists() {
-        String response = "Данный аккаунт Telegram не зарегистрирован";
-        Message message = mock(Message.class);
+        var response = "Данный аккаунт Telegram не зарегистрирован";
+        var message = mock(Message.class);
+
         when(message.getChatId()).thenReturn(chatId);
         when(chatIdService.findByChatId(any())).thenReturn(Optional.empty());
+
         assertThat(forgetAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
     }
 
     @Test
-    public void whenPasswordReset() {
-        Message message = mock(Message.class);
-        ChatId chatIdObj = new ChatId(1, chatIdString, "username", "email", false);
+    public void whenPasswordResetSuccess() {
+        var message = mock(Message.class);
+        var chatIdObj = new ChatId(1, chatIdString, "username", "email", false);
+
         when(message.getChatId()).thenReturn(chatId);
         when(chatIdService.findByChatId(any())).thenReturn(Optional.of(chatIdObj));
         when(tgConfig.getPassword()).thenReturn("password");
         when(authCallWebClint.doPost(any(), any())).thenReturn(Mono.just(new Object()));
         when(tgConfig.getObjectToMap(any())).thenReturn(Map.of("ok", "ok"));
+
         var response = "Логин: " + chatIdObj.getEmail() + System.lineSeparator()
                 + "Новый пароль: password";
+        assertThat(forgetAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
+    }
+
+    @Test
+    public void whenException() {
+        var message = mock(Message.class);
+        var chatIdObj = new ChatId(1, chatIdString, "username", "email", false);
+
+        when(message.getChatId()).thenReturn(chatId);
+        when(chatIdService.findByChatId(any())).thenReturn(Optional.of(chatIdObj));
+        when(tgConfig.getPassword()).thenReturn("password");
+        doThrow(new RuntimeException()).when(authCallWebClint).doPost(any(), any());
+
+        var response = "Сервис не доступен попробуйте позже" + System.lineSeparator()
+                + "/start";
+        assertThat(forgetAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
+    }
+
+    @Test
+    public void whenError() {
+        var message = mock(Message.class);
+        var chatIdObj = new ChatId(1, chatIdString, "username", "email", false);
+
+        when(message.getChatId()).thenReturn(chatId);
+        when(chatIdService.findByChatId(any())).thenReturn(Optional.of(chatIdObj));
+        when(tgConfig.getPassword()).thenReturn("password");
+        when(authCallWebClint.doPost(any(), any())).thenReturn(Mono.just(new Object()));
+        var response = "Ошибка восстановления пароля: обратитесь в поддержку ";
+        when(tgConfig.getObjectToMap(any())).thenReturn(Map.of("error", response));
+
         assertThat(forgetAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
     }
 }

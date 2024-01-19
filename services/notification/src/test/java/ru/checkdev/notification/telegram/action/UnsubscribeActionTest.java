@@ -1,5 +1,6 @@
 package ru.checkdev.notification.telegram.action;
 
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -11,52 +12,47 @@ import ru.checkdev.notification.domain.ChatId;
 import ru.checkdev.notification.service.ChatIdService;
 import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 /**
- * Testing CheckAction class
+ * Testing UnsubscribeAction class
  *
  * @author Oleg Ershov
- * @since 16.01.2024
+ * @since 20.01.2024
  */
-
 @ExtendWith(MockitoExtension.class)
-public class CheckActionTest {
+class UnsubscribeActionTest {
 
     @Mock
     private ChatIdService chatIdService;
     @InjectMocks
-    private CheckAction checkAction;
+    private UnsubscribeAction unsubscribeAction;
     private final long chatId = 123456;
     private final String chatIdString = String.valueOf(chatId);
 
     @Test
     public void whenAccountNotExists() {
         var response = "Данный аккаунт Telegram не зарегистрирован";
-        Message message = mock(Message.class);
-
-        when(message.getChatId()).thenReturn(chatId);
-        when(chatIdService.findByChatId(chatIdString)).thenReturn(Optional.empty());
-
-        assertThat(checkAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
-    }
-
-    @Test
-    public void whenAccountExists() {
-        var username = "username";
-        var email = "123@mail.ru";
-        var sl = System.lineSeparator();
-        var response = "Данные о вашем аккаунте:" + sl
-                + "Имя: " + username + sl
-                + "email: " + email;
         var message = mock(Message.class);
 
         when(message.getChatId()).thenReturn(chatId);
-        var chatIdObj = new ChatId(1, chatIdString, username, email, false);
-        when(chatIdService.findByChatId(chatIdString)).thenReturn(Optional.of(chatIdObj));
+        when(chatIdService.findByChatId(any())).thenReturn(Optional.empty());
 
-        assertThat(checkAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
+        assertThat(unsubscribeAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
+    }
+
+    @Test
+    public void whenUnsubscribeSuccess() {
+        var message = mock(Message.class);
+        var chatIdObj = new ChatId(1, chatIdString, "username", "email", true);
+        var response = "Вы отписаны от уведомлений";
+
+        when(message.getChatId()).thenReturn(chatId);
+        when(chatIdService.findByChatId(any())).thenReturn(Optional.of(chatIdObj));
+
+        assertThat(unsubscribeAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
     }
 
 }
