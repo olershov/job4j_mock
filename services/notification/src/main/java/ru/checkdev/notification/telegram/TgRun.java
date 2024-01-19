@@ -49,13 +49,13 @@ public class TgRun {
                         "/new - регистрация нового пользователя",
                         "/check - информация об аккаунте",
                         "/forget - восстановление пароля",
-                        "/subscribe - подписка",
-                        "/unsubscribe - отписка")),
+                        "/subscribe - подписаться на уведомления",
+                        "/unsubscribe - отписаться от уведомлений")),
                 "/new", new RegAction(tgConfig, tgAuthCallWebClint, urlSiteAuth, chatIdService),
                 "/check", new CheckAction(chatIdService),
                 "/forget", new ForgetAction(tgAuthCallWebClint, tgConfig, chatIdService),
-                "/subscribe", new SubscribeAction(),
-                "/unsubscribe", new UnsubscribeAction()
+                "/subscribe", new SubscribeAction(chatIdService),
+                "/unsubscribe", new UnsubscribeAction(chatIdService)
         );
         try {
             BotMenu menu = new BotMenu(actionMap, username, token);

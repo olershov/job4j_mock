@@ -97,7 +97,7 @@ public class RegAction implements Action {
             return new SendMessage(chatIdNumber, text);
         }
 
-        ChatId chatId = new ChatId(0, chatIdNumber, name, email);
+        ChatId chatId = new ChatId(0, chatIdNumber, name, email, false);
         chatIdService.save(chatId);
 
         text = "Вы зарегистрированы: " + sl

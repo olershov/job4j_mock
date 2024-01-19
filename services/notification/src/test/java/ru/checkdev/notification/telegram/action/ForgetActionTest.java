@@ -52,7 +52,7 @@ class ForgetActionTest {
     @Test
     public void whenPasswordReset() {
         Message message = mock(Message.class);
-        ChatId chatIdObj = new ChatId(1, chatIdString, "username", "email");
+        ChatId chatIdObj = new ChatId(1, chatIdString, "username", "email", false);
         when(message.getChatId()).thenReturn(chatId);
         when(chatIdService.findByChatId(any())).thenReturn(Optional.of(chatIdObj));
         when(tgConfig.getPassword()).thenReturn("password");

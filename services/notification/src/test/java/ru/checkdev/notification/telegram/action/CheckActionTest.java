@@ -50,7 +50,7 @@ public class CheckActionTest {
                 + "email: " + email;
         Message message = mock(Message.class);
         when(message.getChatId()).thenReturn(chatId);
-        ChatId chatIdModel = new ChatId(1, chatIdString, username, email);
+        ChatId chatIdModel = new ChatId(1, chatIdString, username, email, false);
         when(chatIdService.findByChatId(chatIdString)).thenReturn(Optional.of(chatIdModel));
         assertThat(checkAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
     }

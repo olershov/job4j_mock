@@ -24,5 +24,6 @@ public class ChatId {
     private String tgChatId;
     private String username;
     private String email;
+    private boolean notification;
 
 }
