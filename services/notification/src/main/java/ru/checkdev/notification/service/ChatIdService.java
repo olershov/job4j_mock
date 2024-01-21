@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.checkdev.notification.domain.ChatId;
 import ru.checkdev.notification.repository.ChatIdRepository;
+
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -22,6 +24,10 @@ public class ChatIdService {
 
     public Optional<ChatId> findByChatId(String chatId) {
         return repository.findByTgChatId(chatId);
+    }
+
+    public List<ChatId> findAll() {
+        return repository.findAll();
     }
 
 }
