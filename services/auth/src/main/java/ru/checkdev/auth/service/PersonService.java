@@ -38,7 +38,8 @@ import java.util.*;
 
 /**
  * @author parsentev
- * @since 25.09.2016
+ * @author Oleg Ershov
+ * @since 22.01.2024
  */
 @Service
 public class PersonService {
@@ -72,7 +73,13 @@ public class PersonService {
                 this.msg.send(new Notify(profile.getEmail(), keys, Notify.Type.REG.name()));
             }
         } catch (DataIntegrityViolationException e) {
-            log.error("not unique email {}", profile.getEmail());
+            if (e.getRootCause().getMessage().contains("email")) {
+                log.error("not unique email {}", profile.getEmail());
+                throw new DataIntegrityViolationException(String.format("Пользователь с почтой %s уже существует.", profile.getEmail()));
+            } else {
+                log.error("not unique username {}", profile.getUsername());
+                throw new DataIntegrityViolationException(String.format("Пользователь с именем %s уже существует.", profile.getUsername()));
+            }
         }
         return result;
     }
