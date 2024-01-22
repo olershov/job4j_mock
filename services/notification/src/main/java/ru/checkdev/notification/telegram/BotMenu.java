@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Dmitry Stepanov, user Dmitry
  * @author Oleg Ershov
- * @since 21.01.2024
+ * @since 22.01.2024
  */
 public class BotMenu extends TelegramLongPollingBot {
     private final Map<String, String> bindingBy = new ConcurrentHashMap<>();
@@ -25,7 +25,7 @@ public class BotMenu extends TelegramLongPollingBot {
     private final String username;
     private final String token;
     private static final List<String> WAIT_RESPONSE = List.of(
-            "Введите ваше имя и email для регистрации в формате \"имя/email\":"
+            "Введите ваше имя и email для регистрации в формате \"имя#email\":"
     );
 
 
@@ -66,8 +66,15 @@ public class BotMenu extends TelegramLongPollingBot {
             var chatId = update.getMessage().getChatId().toString();
             if (actions.containsKey(key)) {
                 var msg = (SendMessage) actions.get(key).handle(update.getMessage());
-                if (WAIT_RESPONSE.contains(msg.getText())) {
-                    bindingBy.put(chatId, key);
+                var waitResponse = WAIT_RESPONSE.contains(msg.getText());
+                if (bindingBy.size() > 0) {
+                    if (!waitResponse) {
+                        bindingBy.remove(chatId);
+                    }
+                } else {
+                    if (waitResponse) {
+                        bindingBy.put(chatId, key);
+                    }
                 }
                 send(msg);
             } else if (bindingBy.containsKey(chatId)) {

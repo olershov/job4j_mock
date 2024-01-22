@@ -2,6 +2,7 @@ package ru.checkdev.notification.telegram.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -12,7 +13,8 @@ import java.util.regex.Pattern;
  * Класс дополнительных функций телеграм бота, проверка почты, генерация пароля.
  *
  * @author Dmitry Stepanov, user Dmitry
- * @since 12.09.2023
+ * @author Oleg Ershov
+ * @since 22.01.2024
  */
 public class TgConfig {
     private static final ObjectMapper MAPPER = new ObjectMapper();
@@ -42,13 +44,23 @@ public class TgConfig {
     }
 
     /**
-     * Метод проверяет входящую строку на соответствие формату ввода данных username/email
+     * Метод проверяет входящую строку на соответствие формату ввода данных "username#email"
      *
      * @param data String
      * @return boolean
      */
-    public boolean checkFormat(String data) {
-        return data.contains("/") && !data.startsWith("/") && !data.endsWith("/");
+    public Map<String, String> checkFormat(String data) {
+        Map<String, String> result = new HashMap<>();
+        int index = data.indexOf("#");
+        if (index != -1 && index != 0 && index != data.length() - 1) {
+            String username = data.substring(0, index);
+            String email = data.substring(index + 1);
+            if (!username.contains("#") && !email.contains("#")) {
+                result.put("username", username);
+                result.put("email", email);
+            }
+        }
+        return result;
     }
 
     /**

@@ -17,7 +17,8 @@ import java.util.Calendar;
  * Класс реализует пункт меню регистрации нового пользователя в телеграм бот
  *
  * @author Dmitry Stepanov, user Dmitry
- * @since 12.09.2023
+ * @author Oleg Ershov
+ * @since 22.01.2024
  */
 @AllArgsConstructor
 @Slf4j
@@ -37,7 +38,7 @@ public class RegAction implements Action {
             text = "Данный аккаунт Telegram уже зарегистрирован на сайте";
             return new SendMessage(chatIdNumber, text);
         }
-        text = "Введите ваше имя и email для регистрации в формате \"имя/email\":";
+        text = "Введите ваше имя и email для регистрации в формате \"имя#email\":";
         return new SendMessage(chatIdNumber, text);
     }
 
@@ -59,16 +60,15 @@ public class RegAction implements Action {
         var data = message.getText();
         var text = "";
         var sl = System.lineSeparator();
-
-        if (!tgConfig.checkFormat(data)) {
+        var nameAndEmail = tgConfig.checkFormat(data);
+        if (nameAndEmail.isEmpty()) {
             text = "Некорректный формат данных." + sl
                     + "Попробуйте снова" + sl
                     + "/new";
             return new SendMessage(chatIdNumber, text);
         }
-        var substrings = data.split("/");
-        var name = substrings[0];
-        var email = substrings[1];
+        var name = nameAndEmail.get("username");
+        var email = nameAndEmail.get("email");
 
         if (!tgConfig.isEmail(email)) {
             text = "Email: " + email + " некорректный." + sl

@@ -11,7 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Testing TgConfig;
  *
  * @author Dmitry Stepanov, user Dmitry
- * @since 06.10.2023
+ * @author Oleg Ershov
+ * @since 22.01.2024
  */
 class TgConfigTest {
     private final String prefix = "pr/";
@@ -20,23 +21,38 @@ class TgConfigTest {
 
     @Test
     void whenValidDataThenReturnTrue() {
-        var data = "username/mail@mail.ru";
-        var actual = tgConfig.checkFormat(data);
-        assertThat(actual).isTrue();
+        var data = "username#mail@mail.ru";
+        var parsed = tgConfig.checkFormat(data);
+        assertThat(parsed.get("email")).isEqualTo("mail@mail.ru");
+        assertThat(parsed.get("username")).isEqualTo("username");
     }
 
     @Test
     void whenNameIsEmptyThenReturnFalse() {
-        var data = "/mail@mail.ru";
-        var actual = tgConfig.checkFormat(data);
-        assertThat(actual).isFalse();
+        var data = "#mail@mail.ru";
+        var parsed = tgConfig.checkFormat(data);
+        assertThat(parsed).isEmpty();
+    }
+
+    @Test
+    void whenEmailIsEmptyThenReturnFalse() {
+        var data = "username#";
+        var parsed = tgConfig.checkFormat(data);
+        assertThat(parsed).isEmpty();
+    }
+
+    @Test
+    void whenNotContentSeparatorThenReturnFalse() {
+        var data = "username/mail@mail.ru";
+        var parsed = tgConfig.checkFormat(data);
+        assertThat(parsed).isEmpty();
     }
 
     @Test
     void whenInvalidDataThenReturnFalse() {
-        var data = "username mail@mail.ru";
-        var actual = tgConfig.checkFormat(data);
-        assertThat(actual).isFalse();
+        var data = "username##mail@mail.ru";
+        var parsed = tgConfig.checkFormat(data);
+        assertThat(parsed).isEmpty();
     }
 
     @Test

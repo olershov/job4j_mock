@@ -13,6 +13,8 @@ import ru.checkdev.notification.domain.ChatId;
 import ru.checkdev.notification.service.ChatIdService;
 import ru.checkdev.notification.telegram.config.TgConfig;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import static org.mockito.Mockito.*;
@@ -23,7 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
  * Testing RegAction class
  *
  * @author Oleg Ershov
- * @since 20.01.2024
+ * @since 22.01.2024
  */
 
 @ExtendWith(MockitoExtension.class)
@@ -53,7 +55,7 @@ public class RegActionTest {
 
     @Test
     public void whenAccountNotExists() {
-        var response = "Введите ваше имя и email для регистрации в формате \"имя/email\":";
+        var response = "Введите ваше имя и email для регистрации в формате \"имя#email\":";
         var message = mock(Message.class);
 
         when(message.getChatId()).thenReturn(chatId);
@@ -67,8 +69,11 @@ public class RegActionTest {
         var message = mock(Message.class);
 
         when(message.getChatId()).thenReturn(chatId);
-        when(message.getText()).thenReturn("username/email@mail.ru");
-        when(tgConfig.checkFormat(any())).thenReturn(true);
+        when(message.getText()).thenReturn("username#email@mail.ru");
+        when(tgConfig.checkFormat(any())).thenReturn(Map.of(
+                "username", "username",
+                "email", "email@mail.ru"
+                ));
         when(tgConfig.isEmail(any())).thenReturn(true);
         when(tgConfig.getPassword()).thenReturn("password");
         doThrow(new RuntimeException()).when(authCallWebClint).doPost(any(), any());
@@ -83,8 +88,11 @@ public class RegActionTest {
         var message = mock(Message.class);
 
         when(message.getChatId()).thenReturn(chatId);
-        when(message.getText()).thenReturn("username/email@mail.ru");
-        when(tgConfig.checkFormat(any())).thenReturn(true);
+        when(message.getText()).thenReturn("username#email@mail.ru");
+        when(tgConfig.checkFormat(any())).thenReturn(Map.of(
+                "username", "username",
+                "email", "email@mail.ru"
+        ));
         when(tgConfig.isEmail(any())).thenReturn(true);
         when(tgConfig.getPassword()).thenReturn("password");
         when(authCallWebClint.doPost(any(), any())).thenReturn(Mono.just(new Object()));
@@ -103,12 +111,15 @@ public class RegActionTest {
         var sl = System.lineSeparator();
 
         var message = new Message();
-        message.setText(username + "/" + email);
+        message.setText(username + "#" + email);
         var chat = new Chat();
         chat.setId(chatId);
         message.setChat(chat);
 
-        when(tgConfig.checkFormat(any())).thenReturn(true);
+        when(tgConfig.checkFormat(any())).thenReturn(Map.of(
+                "username", username,
+                "email", email
+        ));
         when(tgConfig.isEmail(any())).thenReturn(true);
         when(tgConfig.getPassword()).thenReturn(password);
         when(authCallWebClint.doPost(any(), any())).thenReturn(Mono.just(new Object()));
@@ -118,6 +129,24 @@ public class RegActionTest {
                 + "Логин: " + email + sl
                 + "Пароль: " + password + sl
                 + null;
+        assertThat(regAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
+    }
+
+    @Test
+    public void whenInvalidData() {
+        var sl = System.lineSeparator();
+
+        var message = new Message();
+        message.setText("username/email@mail.ru");
+        var chat = new Chat();
+        chat.setId(chatId);
+        message.setChat(chat);
+
+        when(tgConfig.checkFormat(any())).thenReturn(new HashMap<>());
+
+        var response = "Некорректный формат данных." + sl
+                + "Попробуйте снова" + sl
+                + "/new";
         assertThat(regAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
     }
 
