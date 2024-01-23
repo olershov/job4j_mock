@@ -1,4 +1,4 @@
-package ru.checkdev.notification.service;
+package ru.checkdev.notification.telegram.service;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,7 +10,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import ru.checkdev.notification.NtfSrv;
 import ru.checkdev.notification.domain.ChatId;
 import ru.checkdev.notification.telegram.TgRun;
-import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
 import ru.checkdev.notification.web.TemplateController;
 
 import java.util.List;
@@ -22,7 +21,7 @@ import static org.junit.Assert.*;
  * Testing ChatIdService class
  *
  * @author Oleg Ershov
- * @since 21.01.2024
+ * @since 24.01.2024
  */
 
 @SpringBootTest(classes = NtfSrv.class)

@@ -1,9 +1,9 @@
-package ru.checkdev.notification.service;
+package ru.checkdev.notification.telegram.service;
 
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.checkdev.notification.domain.ChatId;
-import ru.checkdev.notification.repository.ChatIdRepository;
+import ru.checkdev.notification.telegram.repository.ChatIdRepository;
 
 import java.util.List;
 import java.util.Optional;

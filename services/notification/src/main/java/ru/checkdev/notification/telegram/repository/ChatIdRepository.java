@@ -1,4 +1,4 @@
-package ru.checkdev.notification.repository;
+package ru.checkdev.notification.telegram.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import ru.checkdev.notification.domain.ChatId;

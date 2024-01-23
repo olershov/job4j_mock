@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-import ru.checkdev.notification.service.ChatIdService;
+import ru.checkdev.notification.telegram.service.ChatIdService;
 import ru.checkdev.notification.telegram.action.*;
 import ru.checkdev.notification.telegram.config.TgConfig;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
@@ -21,7 +21,8 @@ import java.util.Map;
  * token = берем из properties
  *
  * @author Dmitry Stepanov, user Dmitry
- * @since 12.09.2023
+ * @author Oleg Ershov
+ * @since 24.01.2024
  */
 @Component
 @Slf4j
@@ -54,7 +55,7 @@ public class TgRun {
                 "/new", new RegAction(tgConfig, tgAuthCallWebClint, urlSiteAuth, chatIdService),
                 "/check", new CheckAction(chatIdService),
                 "/forget", new ForgetAction(tgAuthCallWebClint, tgConfig, chatIdService),
-                "/subscribe", new SubscribeAction(chatIdService),
+                "/subscribe", new SubscribeAction(chatIdService, tgConfig, tgAuthCallWebClint),
                 "/unsubscribe", new UnsubscribeAction(chatIdService)
         );
         try {

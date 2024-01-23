@@ -7,10 +7,12 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.checkdev.notification.domain.ChatId;
 import ru.checkdev.notification.domain.PersonDTO;
-import ru.checkdev.notification.service.ChatIdService;
+import ru.checkdev.notification.telegram.service.ChatIdService;
 import ru.checkdev.notification.telegram.config.TgConfig;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
 import java.util.Calendar;
+
+import static ru.checkdev.notification.telegram.config.TgConfig.DELIMITER;
 
 /**
  * 3. Мидл
@@ -18,27 +20,29 @@ import java.util.Calendar;
  *
  * @author Dmitry Stepanov, user Dmitry
  * @author Oleg Ershov
- * @since 22.01.2024
+ * @since 24.01.2024
  */
 @AllArgsConstructor
 @Slf4j
 public class RegAction implements Action {
-    private static final String ERROR_OBJECT = "error";
-    private static final String URL_AUTH_REGISTRATION = "/registration";
     private final TgConfig tgConfig;
     private final TgAuthCallWebClint authCallWebClint;
     private final String urlSiteAuth;
     private final ChatIdService chatIdService;
+    public static final String ENTER_USERNAME_AND_EMAIL =
+            "Введите ваше имя и email для регистрации в формате \"имя" + DELIMITER + "email\":";
+    private static final String URL_AUTH_REGISTRATION = "/registration";
+    private static final String ALREADY_REGISTERED = "Данный аккаунт Telegram уже зарегистрирован на сайте";
 
     @Override
     public BotApiMethod<Message> handle(Message message) {
         var chatIdNumber = message.getChatId().toString();
         var text = "";
         if (chatIdService.findByChatId(chatIdNumber).isPresent()) {
-            text = "Данный аккаунт Telegram уже зарегистрирован на сайте";
+            text = ALREADY_REGISTERED;
             return new SendMessage(chatIdNumber, text);
         }
-        text = "Введите ваше имя и email для регистрации в формате \"имя#email\":";
+        text = ENTER_USERNAME_AND_EMAIL;
         return new SendMessage(chatIdNumber, text);
     }
 
@@ -60,7 +64,7 @@ public class RegAction implements Action {
         var data = message.getText();
         var text = "";
         var sl = System.lineSeparator();
-        var nameAndEmail = tgConfig.checkFormat(data);
+        var nameAndEmail = tgConfig.parseUsernameAndEmail(data);
         if (nameAndEmail.isEmpty()) {
             text = "Некорректный формат данных." + sl
                     + "Попробуйте снова" + sl

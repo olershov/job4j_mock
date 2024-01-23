@@ -6,10 +6,12 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import ru.checkdev.notification.telegram.action.Action;
-
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static ru.checkdev.notification.telegram.action.RegAction.ENTER_USERNAME_AND_EMAIL;
+import static ru.checkdev.notification.telegram.action.SubscribeAction.ENTER_EMAIL_AND_PASSWORD;
 
 /**
  * 3. Мидл
@@ -17,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author Dmitry Stepanov, user Dmitry
  * @author Oleg Ershov
- * @since 22.01.2024
+ * @since 23.01.2024
  */
 public class BotMenu extends TelegramLongPollingBot {
     private final Map<String, String> bindingBy = new ConcurrentHashMap<>();
@@ -25,7 +27,8 @@ public class BotMenu extends TelegramLongPollingBot {
     private final String username;
     private final String token;
     private static final List<String> WAIT_RESPONSE = List.of(
-            "Введите ваше имя и email для регистрации в формате \"имя#email\":"
+            ENTER_USERNAME_AND_EMAIL,
+            ENTER_EMAIL_AND_PASSWORD
     );
 
 

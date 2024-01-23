@@ -1,6 +1,7 @@
 package ru.checkdev.auth.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,8 @@ import java.util.Optional;
 
 /**
  * @author parsentev
- * @since 30.09.2016
+ * @author Oleg Ershov
+ * @since 23.01.2024
  */
 @RestController
 @RequestMapping("/person")
@@ -146,5 +148,23 @@ public class PersonController {
         map.put("personsShowed", persons.findByShow(true, PageRequest.of(pageToShow, limit)));
         map.put("getTotal", persons.showed());
         return new ResponseEntity<>(map, HttpStatus.OK);
+    }
+
+    @PostMapping("/check")
+    public Object check(@RequestBody Profile profile) {
+            Optional<Profile> result = this.persons.findByEmailAndPassword(profile);
+        if (result.isPresent()) {
+            return new Object() {
+                public String getOk() {
+                    return "ok";
+                }
+            };
+        } else {
+            return new Object() {
+                public String getError() {
+                    return "E-mail или пароль введены неверно";
+                }
+            };
+        }
     }
 }

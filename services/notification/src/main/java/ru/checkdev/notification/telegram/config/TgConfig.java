@@ -14,11 +14,12 @@ import java.util.regex.Pattern;
  *
  * @author Dmitry Stepanov, user Dmitry
  * @author Oleg Ershov
- * @since 22.01.2024
+ * @since 23.01.2024
  */
 public class TgConfig {
     private static final ObjectMapper MAPPER = new ObjectMapper();
     private static final Pattern EMAIL_PATTERN = Pattern.compile("\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*\\.\\w{2,4}");
+    public static final String DELIMITER = "#";
     private final String prefix;
     private final int passSize;
 
@@ -47,17 +48,41 @@ public class TgConfig {
      * Метод проверяет входящую строку на соответствие формату ввода данных "username#email"
      *
      * @param data String
-     * @return boolean
+     * @return Map<String, String>
      */
-    public Map<String, String> checkFormat(String data) {
+    public Map<String, String> parseUsernameAndEmail(String data) {
+        Map<String, String> result = checkFormat(data);
+        if (!result.isEmpty()) {
+            result.put("username", result.get("first"));
+            result.put("email", result.get("second"));
+        }
+        return result;
+    }
+
+    /**
+     * Метод проверяет входящую строку на соответствие формату ввода данных "email#password"
+     *
+     * @param data String
+     * @return Map<String, String>
+     */
+    public Map<String, String> parseEmailAndPassword(String data) {
+        Map<String, String> result = checkFormat(data);
+        if (!result.isEmpty()) {
+            result.put("email", result.get("first"));
+            result.put("password", result.get("second"));
+        }
+        return result;
+    }
+
+    private Map<String, String> checkFormat(String data) {
         Map<String, String> result = new HashMap<>();
-        int index = data.indexOf("#");
+        int index = data.indexOf(DELIMITER);
         if (index != -1 && index != 0 && index != data.length() - 1) {
-            String username = data.substring(0, index);
-            String email = data.substring(index + 1);
-            if (!username.contains("#") && !email.contains("#")) {
-                result.put("username", username);
-                result.put("email", email);
+            String first = data.substring(0, index);
+            String second = data.substring(index + 1);
+            if (!first.contains(DELIMITER) && !second.contains(DELIMITER)) {
+                result.put("first", first);
+                result.put("second", second);
             }
         }
         return result;

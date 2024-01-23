@@ -7,7 +7,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.checkdev.notification.domain.ChatId;
 import ru.checkdev.notification.domain.PersonDTO;
-import ru.checkdev.notification.service.ChatIdService;
+import ru.checkdev.notification.telegram.service.ChatIdService;
 import ru.checkdev.notification.telegram.config.TgConfig;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
 import java.util.Calendar;
@@ -17,13 +17,12 @@ import java.util.Optional;
  * Класс реализует пункт меню восстановления пароля в телеграм бот
  *
  * @author Oleg Ershov
- * @since 17.01.24
+ * @since 24.01.24
  */
 @Slf4j
 @AllArgsConstructor
 public class ForgetAction implements Action {
 
-    private static final String ERROR_OBJECT = "error";
     private static final String URL_AUTH_FORGOT = "/forgot";
     private final TgAuthCallWebClint authCallWebClint;
     private final TgConfig tgConfig;
@@ -36,7 +35,7 @@ public class ForgetAction implements Action {
         var text = "";
         Optional<ChatId> chatIdOptional = chatIdService.findByChatId(chatIdNumber);
         if (chatIdOptional.isEmpty()) {
-            text = "Данный аккаунт Telegram не зарегистрирован";
+            text = NOT_REGISTERED;
             return new SendMessage(chatIdNumber, text);
         }
         var email = chatIdOptional.get().getEmail();

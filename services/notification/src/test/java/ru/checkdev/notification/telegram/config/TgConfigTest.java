@@ -12,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  *
  * @author Dmitry Stepanov, user Dmitry
  * @author Oleg Ershov
- * @since 22.01.2024
+ * @since 24.01.2024
  */
 class TgConfigTest {
     private final String prefix = "pr/";
@@ -22,37 +22,53 @@ class TgConfigTest {
     @Test
     void whenValidDataThenReturnTrue() {
         var data = "username#mail@mail.ru";
-        var parsed = tgConfig.checkFormat(data);
+        var parsed = tgConfig.parseUsernameAndEmail(data);
+        var data2 = "mail@mail.ru#password";
+        var parsed2 = tgConfig.parseEmailAndPassword(data2);
         assertThat(parsed.get("email")).isEqualTo("mail@mail.ru");
         assertThat(parsed.get("username")).isEqualTo("username");
+        assertThat(parsed2.get("email")).isEqualTo("mail@mail.ru");
+        assertThat(parsed2.get("password")).isEqualTo("password");
     }
 
     @Test
-    void whenNameIsEmptyThenReturnFalse() {
+    void whenFirstIsEmptyThenReturnFalse() {
         var data = "#mail@mail.ru";
-        var parsed = tgConfig.checkFormat(data);
+        var data2 = "#password";
+        var parsed = tgConfig.parseUsernameAndEmail(data);
+        var parsed2 = tgConfig.parseEmailAndPassword(data2);
         assertThat(parsed).isEmpty();
+        assertThat(parsed2).isEmpty();
     }
 
     @Test
-    void whenEmailIsEmptyThenReturnFalse() {
+    void whenSecondIsEmptyThenReturnFalse() {
         var data = "username#";
-        var parsed = tgConfig.checkFormat(data);
+        var data2 = "mail@mail.ru#";
+        var parsed = tgConfig.parseUsernameAndEmail(data);
+        var parsed2 = tgConfig.parseEmailAndPassword(data2);
         assertThat(parsed).isEmpty();
+        assertThat(parsed2).isEmpty();
     }
 
     @Test
     void whenNotContentSeparatorThenReturnFalse() {
         var data = "username/mail@mail.ru";
-        var parsed = tgConfig.checkFormat(data);
+        var data2 = "mail@mail.ru/password";
+        var parsed = tgConfig.parseUsernameAndEmail(data);
+        var parsed2 = tgConfig.parseEmailAndPassword(data2);
         assertThat(parsed).isEmpty();
+        assertThat(parsed2).isEmpty();
     }
 
     @Test
     void whenInvalidDataThenReturnFalse() {
         var data = "username##mail@mail.ru";
-        var parsed = tgConfig.checkFormat(data);
+        var data2 = "mail@mail.ru##password";
+        var parsed = tgConfig.parseUsernameAndEmail(data);
+        var parsed2 = tgConfig.parseEmailAndPassword(data2);
         assertThat(parsed).isEmpty();
+        assertThat(parsed2).isEmpty();
     }
 
     @Test

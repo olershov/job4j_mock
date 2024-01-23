@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Chat;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import reactor.core.publisher.Mono;
 import ru.checkdev.notification.domain.ChatId;
-import ru.checkdev.notification.service.ChatIdService;
+import ru.checkdev.notification.telegram.service.ChatIdService;
 import ru.checkdev.notification.telegram.config.TgConfig;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
 
@@ -25,7 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
  * Testing RegAction class
  *
  * @author Oleg Ershov
- * @since 22.01.2024
+ * @since 24.01.2024
  */
 
 @ExtendWith(MockitoExtension.class)
@@ -70,7 +70,7 @@ public class RegActionTest {
 
         when(message.getChatId()).thenReturn(chatId);
         when(message.getText()).thenReturn("username#email@mail.ru");
-        when(tgConfig.checkFormat(any())).thenReturn(Map.of(
+        when(tgConfig.parseUsernameAndEmail(any())).thenReturn(Map.of(
                 "username", "username",
                 "email", "email@mail.ru"
                 ));
@@ -89,7 +89,7 @@ public class RegActionTest {
 
         when(message.getChatId()).thenReturn(chatId);
         when(message.getText()).thenReturn("username#email@mail.ru");
-        when(tgConfig.checkFormat(any())).thenReturn(Map.of(
+        when(tgConfig.parseUsernameAndEmail(any())).thenReturn(Map.of(
                 "username", "username",
                 "email", "email@mail.ru"
         ));
@@ -116,7 +116,7 @@ public class RegActionTest {
         chat.setId(chatId);
         message.setChat(chat);
 
-        when(tgConfig.checkFormat(any())).thenReturn(Map.of(
+        when(tgConfig.parseUsernameAndEmail(any())).thenReturn(Map.of(
                 "username", username,
                 "email", email
         ));
@@ -142,7 +142,7 @@ public class RegActionTest {
         chat.setId(chatId);
         message.setChat(chat);
 
-        when(tgConfig.checkFormat(any())).thenReturn(new HashMap<>());
+        when(tgConfig.parseUsernameAndEmail(any())).thenReturn(new HashMap<>());
 
         var response = "Некорректный формат данных." + sl
                 + "Попробуйте снова" + sl

@@ -5,14 +5,14 @@ import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import ru.checkdev.notification.domain.ChatId;
-import ru.checkdev.notification.service.ChatIdService;
+import ru.checkdev.notification.telegram.service.ChatIdService;
 import java.util.Optional;
 
 /**
  * Класс реализует пункт меню получения информации о привязанном аккаунте в телеграм бот
  *
  * @author Oleg Ershov
- * @since 16.01.2024
+ * @since 24.01.2024
  */
 @AllArgsConstructor
 public class CheckAction implements Action {
@@ -33,7 +33,7 @@ public class CheckAction implements Action {
         var sl = System.lineSeparator();
         Optional<ChatId> chatIdOptional = chatIdService.findByChatId(chatIdNumber);
         if (chatIdOptional.isEmpty()) {
-            text = "Данный аккаунт Telegram не зарегистрирован";
+            text = NOT_REGISTERED;
             return new SendMessage(chatIdNumber, text);
         }
         var chatId = chatIdOptional.get();
