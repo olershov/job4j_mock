@@ -10,6 +10,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import reactor.core.publisher.Mono;
 import ru.checkdev.notification.domain.ChatId;
+import ru.checkdev.notification.domain.PersonDTO;
 import ru.checkdev.notification.telegram.config.TgConfig;
 import ru.checkdev.notification.telegram.service.ChatIdService;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
@@ -24,7 +25,7 @@ import static org.mockito.Mockito.*;
  * Testing SubscribeAction class
  *
  * @author Oleg Ershov
- * @since 24.01.2024
+ * @since 25.01.2024
  */
 @ExtendWith(MockitoExtension.class)
 class SubscribeActionTest {
@@ -106,7 +107,7 @@ class SubscribeActionTest {
                 "email", "email@mail.ru", "password", "password"
         ));
         when(tgConfig.isEmail(any())).thenReturn(true);
-        doThrow(new RuntimeException()).when(tgAuthCallWebClint).doPost(any(), any());
+        doThrow(new RuntimeException()).when(tgAuthCallWebClint).doGet(any());
 
         var response = "Сервис не доступен попробуйте позже" + sl
                 + "/start";
@@ -124,10 +125,9 @@ class SubscribeActionTest {
                 "email", "email@mail.ru", "password", "password"
         ));
         when(tgConfig.isEmail(any())).thenReturn(true);
-        when(tgAuthCallWebClint.doPost(any(), any())).thenReturn(Mono.just(new Object()));
-        when(tgConfig.getObjectToMap(any())).thenReturn(Map.of("error", errorMessage));
+        when(tgAuthCallWebClint.doGet(any())).thenReturn(Mono.just(new PersonDTO()));
 
-        var response = "Ошибка оформления подписки: " + errorMessage;
+        var response = "Ошибка оформления подписки: email или пароль введены неверно";
         assertThat(subscribeAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
     }
 
@@ -141,8 +141,9 @@ class SubscribeActionTest {
                 "email", "email@mail.ru", "password", "password"
         ));
         when(tgConfig.isEmail(any())).thenReturn(true);
-        when(tgAuthCallWebClint.doPost(any(), any())).thenReturn(Mono.just(new Object()));
-        when(tgConfig.getObjectToMap(any())).thenReturn(Map.of("username", "username"));
+        PersonDTO personDTO = new PersonDTO();
+        personDTO.setEmail("email@mail.ru");
+        when(tgAuthCallWebClint.doGet(any())).thenReturn(Mono.just(personDTO));
         when(chatIdService.findByChatId(any())).thenReturn(Optional.of(new ChatId()));
 
         var response = "Вы подписаны на уведомления";

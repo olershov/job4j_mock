@@ -39,7 +39,7 @@ import java.util.*;
 /**
  * @author parsentev
  * @author Oleg Ershov
- * @since 23.01.2024
+ * @since 25.01.2024
  */
 @Service
 public class PersonService {
@@ -113,11 +113,11 @@ public class PersonService {
         return result;
     }
 
-    public Optional<Profile> findByEmailAndPassword(Profile profile) {
+    public Optional<Profile> findByEmailAndPassword(String email, String password) {
         Optional<Profile> result = Optional.empty();
-        Profile inDb = this.persons.findByEmail(profile.getEmail());
+        Profile inDb = this.persons.findByEmail(email);
         if (inDb != null) {
-            if (encoding.matches(profile.getPassword(), inDb.getPassword())) {
+            if (encoding.matches(password, inDb.getPassword())) {
                 result = Optional.of(inDb);
             }
         }

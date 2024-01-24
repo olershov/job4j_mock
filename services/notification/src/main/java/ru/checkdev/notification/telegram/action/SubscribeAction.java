@@ -20,7 +20,7 @@ import static ru.checkdev.notification.telegram.config.TgConfig.DELIMITER;
  * Класс реализует пункт подписки на уведомления в телеграм бот
  *
  * @author Oleg Ershov
- * @since 24.01.24
+ * @since 25.01.24
  */
 @Slf4j
 @AllArgsConstructor
@@ -30,7 +30,7 @@ public class SubscribeAction implements Action {
     private final TgAuthCallWebClint authCallWebClint;
     public static final String ENTER_EMAIL_AND_PASSWORD =
             "Введите ваш email и пароль для подписки на уведомления в формате \"email" + DELIMITER + "password\":";
-    private static final String FIND_PERSON = "/person/check";
+    private static final String FIND_PERSON = "/person/check?email=%s&password=%s";
 
     @Override
     public BotApiMethod<Message> handle(Message message) {
@@ -68,12 +68,9 @@ public class SubscribeAction implements Action {
                     + "/subscribe";
             return new SendMessage(chatIdNumber, text);
         }
-
-        var person = new PersonDTO(email, password, null, true, null,
-                Calendar.getInstance());
-        Object result;
+        PersonDTO result;
         try {
-            result = authCallWebClint.doPost(FIND_PERSON, person).block();
+            result = authCallWebClint.doGet(FIND_PERSON.formatted(email, password)).block();
         } catch (Exception e) {
             log.error("WebClient doPost error: {}", e.getMessage());
             text = "Сервис не доступен попробуйте позже" + sl
@@ -81,10 +78,8 @@ public class SubscribeAction implements Action {
             return new SendMessage(chatIdNumber, text);
         }
 
-        var mapObject = tgConfig.getObjectToMap(result);
-
-        if (mapObject.containsKey(ERROR_OBJECT)) {
-            text = "Ошибка оформления подписки: " + mapObject.get(ERROR_OBJECT);
+        if (result.getEmail() == null) {
+            text = "Ошибка оформления подписки: email или пароль введены неверно";
             return new SendMessage(chatIdNumber, text);
         }
 

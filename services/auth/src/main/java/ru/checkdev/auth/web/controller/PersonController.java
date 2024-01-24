@@ -1,7 +1,6 @@
 package ru.checkdev.auth.web.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
@@ -14,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.checkdev.auth.domain.Profile;
 import ru.checkdev.auth.service.PersonService;
 import ru.checkdev.auth.service.RoleService;
-
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.security.Principal;
@@ -25,7 +23,7 @@ import java.util.Optional;
 /**
  * @author parsentev
  * @author Oleg Ershov
- * @since 23.01.2024
+ * @since 25.01.2024
  */
 @RestController
 @RequestMapping("/person")
@@ -150,21 +148,9 @@ public class PersonController {
         return new ResponseEntity<>(map, HttpStatus.OK);
     }
 
-    @PostMapping("/check")
-    public Object check(@RequestBody Profile profile) {
-            Optional<Profile> result = this.persons.findByEmailAndPassword(profile);
-        if (result.isPresent()) {
-            return new Object() {
-                public String getOk() {
-                    return "ok";
-                }
-            };
-        } else {
-            return new Object() {
-                public String getError() {
-                    return "E-mail или пароль введены неверно";
-                }
-            };
-        }
+    @GetMapping("/check")
+    public Profile check(@RequestParam String email, String password) {
+            Optional<Profile> result = this.persons.findByEmailAndPassword(email, password);
+        return result.orElseGet(Profile::new);
     }
 }
