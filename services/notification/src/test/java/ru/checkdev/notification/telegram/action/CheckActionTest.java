@@ -18,7 +18,7 @@ import static org.mockito.Mockito.when;
  * Testing CheckAction class
  *
  * @author Oleg Ershov
- * @since 16.01.2024
+ * @since 30.01.2024
  */
 
 @ExtendWith(MockitoExtension.class)
@@ -37,7 +37,7 @@ public class CheckActionTest {
         Message message = mock(Message.class);
 
         when(message.getChatId()).thenReturn(chatId);
-        when(chatIdService.findByChatId(chatIdString)).thenReturn(Optional.empty());
+        when(chatIdService.isReg(chatIdString)).thenReturn(false);
 
         assertThat(checkAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
     }
@@ -51,9 +51,10 @@ public class CheckActionTest {
                 + "Имя: " + username + sl
                 + "email: " + email;
         var message = mock(Message.class);
+        var chatIdObj = new ChatId(1, chatIdString, username, email, false, true);
 
         when(message.getChatId()).thenReturn(chatId);
-        var chatIdObj = new ChatId(1, chatIdString, username, email, false);
+        when(chatIdService.isReg(chatIdString)).thenReturn(true);
         when(chatIdService.findByChatId(chatIdString)).thenReturn(Optional.of(chatIdObj));
 
         assertThat(checkAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));

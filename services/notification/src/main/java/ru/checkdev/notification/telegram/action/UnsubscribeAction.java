@@ -13,7 +13,7 @@ import java.util.Optional;
  * Класс реализует пункт отписки от уведомлений в телеграм бот
  *
  * @author Oleg Ershov
- * @since 24.01.24
+ * @since 30.01.24
  */
 @AllArgsConstructor
 public class UnsubscribeAction implements Action {
@@ -24,11 +24,10 @@ public class UnsubscribeAction implements Action {
     public BotApiMethod<Message> handle(Message message) {
         var chatIdNumber = message.getChatId().toString();
         var text = NOT_REGISTERED;
-        Optional<ChatId> chatIdOptional = chatIdService.findByChatId(chatIdNumber);
-        if (chatIdOptional.isEmpty()) {
+        if (!chatIdService.isReg(chatIdNumber)) {
             return new SendMessage(chatIdNumber, text);
         }
-        var chatId = chatIdOptional.get();
+        var chatId = chatIdService.findByChatId(chatIdNumber).get();
         if (chatId.isNotification()) {
             chatId.setNotification(false);
             chatIdService.save(chatId);

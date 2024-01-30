@@ -30,4 +30,11 @@ public class ChatIdService {
         return repository.findAll();
     }
 
+    public boolean isReg(String chatId) {
+        Optional<ChatId> chatIdOptional = findByChatId(chatId);
+        if (chatIdOptional.isEmpty()) {
+            return false;
+        }
+        return chatIdOptional.get().isReg();
+    }
 }

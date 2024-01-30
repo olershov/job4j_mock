@@ -17,7 +17,7 @@ import java.util.Optional;
  * Класс реализует пункт меню восстановления пароля в телеграм бот
  *
  * @author Oleg Ershov
- * @since 24.01.24
+ * @since 30.01.24
  */
 @Slf4j
 @AllArgsConstructor
@@ -33,12 +33,11 @@ public class ForgetAction implements Action {
         var chatIdNumber = message.getChatId().toString();
         var sl = System.lineSeparator();
         var text = "";
-        Optional<ChatId> chatIdOptional = chatIdService.findByChatId(chatIdNumber);
-        if (chatIdOptional.isEmpty()) {
+        if (!chatIdService.isReg(chatIdNumber)) {
             text = NOT_REGISTERED;
             return new SendMessage(chatIdNumber, text);
         }
-        var email = chatIdOptional.get().getEmail();
+        var email = chatIdService.findByChatId(chatIdNumber).get().getEmail();
         var password = tgConfig.getPassword();
         var person = new PersonDTO(email, password, null, true, null,
                 Calendar.getInstance());

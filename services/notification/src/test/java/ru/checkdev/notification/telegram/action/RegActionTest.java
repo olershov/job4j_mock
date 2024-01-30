@@ -25,7 +25,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
  * Testing RegAction class
  *
  * @author Oleg Ershov
- * @since 24.01.2024
+ * @since 30.01.2024
  */
 
 @ExtendWith(MockitoExtension.class)
@@ -46,9 +46,11 @@ public class RegActionTest {
     public void whenAccountAlreadyExists() {
         var response = "Данный аккаунт Telegram уже зарегистрирован на сайте";
         var message = mock(Message.class);
+        var chatIdNew = new ChatId();
+        chatIdNew.setReg(true);
 
         when(message.getChatId()).thenReturn(chatId);
-        when(chatIdService.findByChatId(any())).thenReturn(Optional.of(new ChatId()));
+        when(chatIdService.findByChatId(any())).thenReturn(Optional.of(chatIdNew));
 
         assertThat(regAction.handle(message)).isEqualTo(new SendMessage(chatIdString, response));
     }
@@ -124,6 +126,7 @@ public class RegActionTest {
         when(tgConfig.getPassword()).thenReturn(password);
         when(authCallWebClint.doPost(any(), any())).thenReturn(Mono.just(new Object()));
         when(tgConfig.getObjectToMap(any())).thenReturn(Map.of("username", "username"));
+        when(chatIdService.findByChatId(any())).thenReturn(Optional.of(new ChatId()));
 
         var response = "Вы зарегистрированы: " + sl
                 + "Логин: " + email + sl

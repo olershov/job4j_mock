@@ -8,7 +8,7 @@ import javax.persistence.*;
 
 /**
  * @author Oleg Ershov
- * @since 15.01.2024
+ * @since 30.01.2024
  */
 @Data
 @AllArgsConstructor
@@ -25,5 +25,5 @@ public class ChatId {
     private String username;
     private String email;
     private boolean notification;
-
+    private boolean reg;
 }

@@ -22,7 +22,7 @@ import static org.mockito.Mockito.*;
  * Testing ForgetAction class
  *
  * @author Oleg Ershov
- * @since 20.01.2024
+ * @since 30.01.2024
  */
 
 @ExtendWith(MockitoExtension.class)
@@ -45,7 +45,7 @@ class ForgetActionTest {
         var message = mock(Message.class);
 
         when(message.getChatId()).thenReturn(chatId);
-        when(chatIdService.findByChatId(any())).thenReturn(Optional.empty());
+        when(chatIdService.isReg(any())).thenReturn(false);
 
         assertThat(forgetAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
     }
@@ -53,9 +53,10 @@ class ForgetActionTest {
     @Test
     public void whenPasswordResetSuccess() {
         var message = mock(Message.class);
-        var chatIdObj = new ChatId(1, chatIdString, "username", "email", false);
+        var chatIdObj = new ChatId(1, chatIdString, "username", "email", false, true);
 
         when(message.getChatId()).thenReturn(chatId);
+        when(chatIdService.isReg(any())).thenReturn(true);
         when(chatIdService.findByChatId(any())).thenReturn(Optional.of(chatIdObj));
         when(tgConfig.getPassword()).thenReturn("password");
         when(authCallWebClint.doPost(any(), any())).thenReturn(Mono.just(new Object()));
@@ -69,9 +70,10 @@ class ForgetActionTest {
     @Test
     public void whenException() {
         var message = mock(Message.class);
-        var chatIdObj = new ChatId(1, chatIdString, "username", "email", false);
+        var chatIdObj = new ChatId(1, chatIdString, "username", "email", false, true);
 
         when(message.getChatId()).thenReturn(chatId);
+        when(chatIdService.isReg(any())).thenReturn(true);
         when(chatIdService.findByChatId(any())).thenReturn(Optional.of(chatIdObj));
         when(tgConfig.getPassword()).thenReturn("password");
         doThrow(new RuntimeException()).when(authCallWebClint).doPost(any(), any());
@@ -84,9 +86,10 @@ class ForgetActionTest {
     @Test
     public void whenError() {
         var message = mock(Message.class);
-        var chatIdObj = new ChatId(1, chatIdString, "username", "email", false);
+        var chatIdObj = new ChatId(1, chatIdString, "username", "email", false, true);
 
         when(message.getChatId()).thenReturn(chatId);
+        when(chatIdService.isReg(any())).thenReturn(true);
         when(chatIdService.findByChatId(any())).thenReturn(Optional.of(chatIdObj));
         when(tgConfig.getPassword()).thenReturn("password");
         when(authCallWebClint.doPost(any(), any())).thenReturn(Mono.just(new Object()));

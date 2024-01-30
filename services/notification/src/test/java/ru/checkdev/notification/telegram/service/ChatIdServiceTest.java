@@ -12,6 +12,7 @@ import ru.checkdev.notification.domain.ChatId;
 import ru.checkdev.notification.telegram.TgRun;
 import ru.checkdev.notification.web.TemplateController;
 
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,6 +28,7 @@ import static org.junit.Assert.*;
 @SpringBootTest(classes = NtfSrv.class)
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
+@Transactional
 public class ChatIdServiceTest {
 
     @Autowired
@@ -43,14 +45,18 @@ public class ChatIdServiceTest {
 
     @Test
     public void whenSave() {
-        ChatId chatId = chatIdService.save(new ChatId(0, "123456", "username", "email", true));
+        ChatId chatId = chatIdService.save(new ChatId(
+                0, "123456", "username", "email", true, true
+                ));
         List<ChatId> result = chatIdService.findAll();
         assertTrue(result.contains(chatId));
     }
 
     @Test
     public void whenFoundById() {
-        ChatId chatId = chatIdService.save(new ChatId(0, "123456", "username", "email", true));
+        ChatId chatId = chatIdService.save(new ChatId(
+                0, "123456", "username", "email", true, true
+        ));
         Optional<ChatId> resultOptional = chatIdService.findByChatId(chatId.getTgChatId());
         ChatId result = resultOptional.get();
         assertEquals(result.getUsername(), chatId.getUsername());
@@ -62,5 +68,26 @@ public class ChatIdServiceTest {
     public void whenNotFoundById() {
         Optional<ChatId> result = chatIdService.findByChatId("123456");
         assertTrue(result.isEmpty());
+    }
+
+    @Test
+    public void whenIsReg() {
+        ChatId chatId = chatIdService.save(new ChatId(
+                0, "123456", "username", "email", true, true
+        ));
+        assertTrue(chatIdService.isReg(chatId.getTgChatId()));
+    }
+
+    @Test
+    public void whenIsNotReg() {
+        ChatId chatId = chatIdService.save(new ChatId(
+                0, "123456", "username", "email", true, false
+        ));
+        assertFalse(chatIdService.isReg(chatId.getTgChatId()));
+    }
+
+    @Test
+    public void whenIsNotFind() {
+        assertFalse(chatIdService.isReg("123456"));
     }
 }

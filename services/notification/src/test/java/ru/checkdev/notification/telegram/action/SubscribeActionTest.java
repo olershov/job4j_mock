@@ -25,7 +25,7 @@ import static org.mockito.Mockito.*;
  * Testing SubscribeAction class
  *
  * @author Oleg Ershov
- * @since 25.01.2024
+ * @since 30.01.2024
  */
 @ExtendWith(MockitoExtension.class)
 class SubscribeActionTest {
@@ -46,7 +46,7 @@ class SubscribeActionTest {
         var message = mock(Message.class);
 
         when(message.getChatId()).thenReturn(chatId);
-        when(chatIdService.findByChatId(any())).thenReturn(Optional.empty());
+        when(chatIdService.isReg(any())).thenReturn(false);
 
         var response = "Данный аккаунт Telegram не зарегистрирован";
         assertThat(subscribeAction.handle(message)).isEqualTo(new SendMessage(chatIdString, response));
@@ -57,7 +57,7 @@ class SubscribeActionTest {
         var message = mock(Message.class);
 
         when(message.getChatId()).thenReturn(chatId);
-        when(chatIdService.findByChatId(any())).thenReturn(Optional.of(new ChatId()));
+        when(chatIdService.isReg(any())).thenReturn(true);
 
         var response =  "Введите ваш email и пароль для подписки на уведомления в формате \"email#password\":";
         assertThat(subscribeAction.handle(message)).isEqualTo(new SendMessage(chatIdString, response));

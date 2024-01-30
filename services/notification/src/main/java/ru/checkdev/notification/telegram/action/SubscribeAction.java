@@ -20,7 +20,7 @@ import static ru.checkdev.notification.telegram.config.TgConfig.DELIMITER;
  * Класс реализует пункт подписки на уведомления в телеграм бот
  *
  * @author Oleg Ershov
- * @since 25.01.24
+ * @since 30.01.24
  */
 @Slf4j
 @AllArgsConstructor
@@ -36,8 +36,7 @@ public class SubscribeAction implements Action {
     public BotApiMethod<Message> handle(Message message) {
         var chatIdNumber = message.getChatId().toString();
         var text = NOT_REGISTERED;
-        Optional<ChatId> chatIdOptional = chatIdService.findByChatId(chatIdNumber);
-        if (chatIdOptional.isEmpty()) {
+        if (!chatIdService.isReg(chatIdNumber)) {
             return new SendMessage(chatIdNumber, text);
         }
         text = ENTER_EMAIL_AND_PASSWORD;

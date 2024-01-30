@@ -20,7 +20,7 @@ import static ru.checkdev.notification.telegram.config.TgConfig.DELIMITER;
  *
  * @author Dmitry Stepanov, user Dmitry
  * @author Oleg Ershov
- * @since 24.01.2024
+ * @since 30.01.2024
  */
 @AllArgsConstructor
 @Slf4j
@@ -38,9 +38,16 @@ public class RegAction implements Action {
     public BotApiMethod<Message> handle(Message message) {
         var chatIdNumber = message.getChatId().toString();
         var text = "";
-        if (chatIdService.findByChatId(chatIdNumber).isPresent()) {
-            text = ALREADY_REGISTERED;
-            return new SendMessage(chatIdNumber, text);
+        var chatIdOptional = chatIdService.findByChatId(chatIdNumber);
+        if (chatIdOptional.isPresent()) {
+            if (chatIdOptional.get().isReg()) {
+                text = ALREADY_REGISTERED;
+                return new SendMessage(chatIdNumber, text);
+            }
+        } else {
+            var chatId = new ChatId();
+            chatId.setTgChatId(chatIdNumber);
+            chatIdService.save(chatId);
         }
         text = ENTER_USERNAME_AND_EMAIL;
         return new SendMessage(chatIdNumber, text);
@@ -101,7 +108,10 @@ public class RegAction implements Action {
             return new SendMessage(chatIdNumber, text);
         }
 
-        ChatId chatId = new ChatId(0, chatIdNumber, name, email, false);
+        var chatId = chatIdService.findByChatId(chatIdNumber).get();
+        chatId.setEmail(email);
+        chatId.setUsername(name);
+        chatId.setReg(true);
         chatIdService.save(chatId);
 
         text = "Вы зарегистрированы: " + sl

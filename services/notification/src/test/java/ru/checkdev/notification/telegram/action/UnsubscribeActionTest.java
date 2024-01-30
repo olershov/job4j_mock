@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
  * Testing UnsubscribeAction class
  *
  * @author Oleg Ershov
- * @since 20.01.2024
+ * @since 30.01.2024
  */
 @ExtendWith(MockitoExtension.class)
 class UnsubscribeActionTest {
@@ -38,7 +38,7 @@ class UnsubscribeActionTest {
         var message = mock(Message.class);
 
         when(message.getChatId()).thenReturn(chatId);
-        when(chatIdService.findByChatId(any())).thenReturn(Optional.empty());
+        when(chatIdService.isReg(any())).thenReturn(false);
 
         assertThat(unsubscribeAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));
     }
@@ -46,10 +46,11 @@ class UnsubscribeActionTest {
     @Test
     public void whenUnsubscribeSuccess() {
         var message = mock(Message.class);
-        var chatIdObj = new ChatId(1, chatIdString, "username", "email", true);
+        var chatIdObj = new ChatId(1, chatIdString, "username", "email", true, true);
         var response = "Вы отписаны от уведомлений";
 
         when(message.getChatId()).thenReturn(chatId);
+        when(chatIdService.isReg(any())).thenReturn(true);
         when(chatIdService.findByChatId(any())).thenReturn(Optional.of(chatIdObj));
 
         assertThat(unsubscribeAction.callback(message)).isEqualTo(new SendMessage(chatIdString, response));

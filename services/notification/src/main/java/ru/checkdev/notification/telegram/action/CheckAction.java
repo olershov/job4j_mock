@@ -12,7 +12,7 @@ import java.util.Optional;
  * Класс реализует пункт меню получения информации о привязанном аккаунте в телеграм бот
  *
  * @author Oleg Ershov
- * @since 24.01.2024
+ * @since 30.01.2024
  */
 @AllArgsConstructor
 public class CheckAction implements Action {
@@ -29,14 +29,12 @@ public class CheckAction implements Action {
     @Override
     public BotApiMethod<Message> handle(Message message) {
         var chatIdNumber = message.getChatId().toString();
-        var text = "";
+        var text = NOT_REGISTERED;
         var sl = System.lineSeparator();
-        Optional<ChatId> chatIdOptional = chatIdService.findByChatId(chatIdNumber);
-        if (chatIdOptional.isEmpty()) {
-            text = NOT_REGISTERED;
+        if (!chatIdService.isReg(chatIdNumber)) {
             return new SendMessage(chatIdNumber, text);
         }
-        var chatId = chatIdOptional.get();
+        var chatId = chatIdService.findByChatId(chatIdNumber).get();
         text = "Данные о вашем аккаунте:" + sl
                 + "Имя: " + chatId.getUsername() + sl
                 + "email: " + chatId.getEmail();
