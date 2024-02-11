@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.checkdev.auth.domain.Profile;
 import ru.checkdev.auth.service.PersonService;
 import ru.checkdev.auth.service.RoleService;
-
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.security.Principal;
@@ -23,7 +22,8 @@ import java.util.Optional;
 
 /**
  * @author parsentev
- * @since 30.09.2016
+ * @author Oleg Ershov
+ * @since 25.01.2024
  */
 @RestController
 @RequestMapping("/person")
@@ -146,5 +146,11 @@ public class PersonController {
         map.put("personsShowed", persons.findByShow(true, PageRequest.of(pageToShow, limit)));
         map.put("getTotal", persons.showed());
         return new ResponseEntity<>(map, HttpStatus.OK);
+    }
+
+    @GetMapping("/check")
+    public Profile check(@RequestParam String email, String password) {
+            Optional<Profile> result = this.persons.findByEmailAndPassword(email, password);
+        return result.orElseGet(Profile::new);
     }
 }

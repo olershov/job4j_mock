@@ -7,11 +7,10 @@ import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
-import ru.checkdev.notification.telegram.action.Action;
-import ru.checkdev.notification.telegram.action.InfoAction;
-import ru.checkdev.notification.telegram.action.RegAction;
+import ru.checkdev.notification.telegram.service.ChatIdService;
+import ru.checkdev.notification.telegram.action.*;
+import ru.checkdev.notification.telegram.config.TgConfig;
 import ru.checkdev.notification.telegram.service.TgAuthCallWebClint;
-
 import java.util.List;
 import java.util.Map;
 
@@ -22,12 +21,15 @@ import java.util.Map;
  * token = берем из properties
  *
  * @author Dmitry Stepanov, user Dmitry
- * @since 12.09.2023
+ * @author Oleg Ershov
+ * @since 24.01.2024
  */
 @Component
 @Slf4j
 public class TgRun {
     private final TgAuthCallWebClint tgAuthCallWebClint;
+    private final ChatIdService chatIdService;
+    private final TgConfig tgConfig = new TgConfig();
     @Value("${tg.username}")
     private String username;
     @Value("${tg.token}")
@@ -35,16 +37,26 @@ public class TgRun {
     @Value("${server.site.url.login}")
     private String urlSiteAuth;
 
-    public TgRun(TgAuthCallWebClint tgAuthCallWebClint) {
+    public TgRun(TgAuthCallWebClint tgAuthCallWebClint, ChatIdService chatIdService) {
         this.tgAuthCallWebClint = tgAuthCallWebClint;
+        this.chatIdService = chatIdService;
     }
 
     @Bean
     public void initTg() {
         Map<String, Action> actionMap = Map.of(
                 "/start", new InfoAction(List.of(
-                        "/start", "/new")),
-                "/new", new RegAction(tgAuthCallWebClint, urlSiteAuth)
+                        "/start - команды бота",
+                        "/new - регистрация нового пользователя",
+                        "/check - информация об аккаунте",
+                        "/forget - восстановление пароля",
+                        "/subscribe - подписаться на уведомления",
+                        "/unsubscribe - отписаться от уведомлений")),
+                "/new", new RegAction(tgConfig, tgAuthCallWebClint, urlSiteAuth, chatIdService),
+                "/check", new CheckAction(chatIdService),
+                "/forget", new ForgetAction(tgAuthCallWebClint, tgConfig, chatIdService),
+                "/subscribe", new SubscribeAction(chatIdService, tgConfig, tgAuthCallWebClint),
+                "/unsubscribe", new UnsubscribeAction(chatIdService)
         );
         try {
             BotMenu menu = new BotMenu(actionMap, username, token);

@@ -1,7 +1,6 @@
 package ru.checkdev.auth.service;
 
 import com.google.common.collect.Lists;
-import org.apache.commons.lang.RandomStringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -39,7 +38,8 @@ import java.util.*;
 
 /**
  * @author parsentev
- * @since 25.09.2016
+ * @author Oleg Ershov
+ * @since 25.01.2024
  */
 @Service
 public class PersonService {
@@ -73,7 +73,13 @@ public class PersonService {
                 this.msg.send(new Notify(profile.getEmail(), keys, Notify.Type.REG.name()));
             }
         } catch (DataIntegrityViolationException e) {
-            log.error("not unique email {}", profile.getEmail());
+            if (e.getRootCause().getMessage().contains("email")) {
+                log.error("not unique email {}", profile.getEmail());
+                throw new DataIntegrityViolationException(String.format("Пользователь с почтой %s уже существует.", profile.getEmail()));
+            } else {
+                log.error("not unique username {}", profile.getUsername());
+                throw new DataIntegrityViolationException(String.format("Пользователь с именем %s уже существует.", profile.getUsername()));
+            }
         }
         return result;
     }
@@ -107,6 +113,17 @@ public class PersonService {
         return result;
     }
 
+    public Optional<Profile> findByEmailAndPassword(String email, String password) {
+        Optional<Profile> result = Optional.empty();
+        Profile inDb = this.persons.findByEmail(email);
+        if (inDb != null) {
+            if (encoding.matches(password, inDb.getPassword())) {
+                result = Optional.of(inDb);
+            }
+        }
+        return result;
+    }
+
     public List<Profile> getAll() {
         return Lists.newArrayList(persons.findAll());
     }
@@ -133,7 +150,7 @@ public class PersonService {
         if (find == null) {
             result = Optional.empty();
         } else {
-            String password = RandomStringUtils.randomAlphabetic(8);
+            String password = profile.getPassword();
             find.setPassword(this.encoding.encode(password));
             this.persons.save(find);
             Map<String, Object> keys = new HashMap<>();
