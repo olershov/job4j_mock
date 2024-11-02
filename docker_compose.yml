@@ -1,0 +1,67 @@
+version: "2.18"
+services:
+  db:
+    image: postgres
+    container_name: db
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=cd_notification
+      - POSTGRES_DB=cd_desc
+      - POSTGRES_DB=mock
+      - POSTGRES_DB=cd_auth
+      - PGDATA=/var/lib/postgresql/data
+    volumes:
+      - ./db/shortcut/data:/var/lib/postgresql/data
+    restart: always
+  job4j_auth:
+    build:
+      context: ./services/auth
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/cd_auth
+      - SPRING_DATASOURCE_USERNAME=compose-postgres
+      - SPRING_DATASOURCE_PASSWORD=compose-postgres
+    container_name: job4j_auth
+    depends_on:
+      - db
+  job4j_desc:
+    build:
+      context: ./services/desc
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/cd_desc
+      - SPRING_DATASOURCE_USERNAME=compose-postgres
+      - SPRING_DATASOURCE_PASSWORD=compose-postgres
+    container_name: job4j_desc
+    depends_on:
+      - db
+  job4j_mock:
+    build:
+      context: ./services/mock
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/mock
+      - SPRING_DATASOURCE_USERNAME=compose-postgres
+      - SPRING_DATASOURCE_PASSWORD=compose-postgres
+    container_name: job4j_mock
+    depends_on:
+      - db
+  job4j_notification:
+    build:
+      context: ./services/notification
+      dockerfile: Dockerfile
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/cd_notification
+      - SPRING_DATASOURCE_USERNAME=compose-postgres
+      - SPRING_DATASOURCE_PASSWORD=compose-postgres
+    container_name: job4j_notification
+    depends_on:
+      - db
+  job4j_site:
+    build:
+      context: ./services/site
+      dockerfile: Dockerfile
+    container_name: job4j_site
+    depends_on:
+      - db
