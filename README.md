@@ -8,8 +8,18 @@ job4j_mock
 одного из откликнувшихся и проводит собеседование. По результатам оба участника оставляют друг другу отзывы о
 знаниях выбранной темы.
 
+## Запуск приложения через docker-compose
+* Установить Docker и Docker-compose
+* Склонировать проект с репозитория:
+ `git clone https://github.com/olershov/job4j_mock.git`
+* Перейти в директорию с приложением:
+  `cd job4j_mock`
+* Создать образы проекта:
+  `docker compose build`
+* Поднять образы проекты:
+  `docker compose up`
 
-
+  
 ## Контактная информация:
 <a href="https://t.me/ol_ruff">
 <img alt="Static Badge" src="https://img.shields.io/badge/Telegram-blue?style=social&logo=telegram&logoColor=rgb&labelColor=hex&color=hex">

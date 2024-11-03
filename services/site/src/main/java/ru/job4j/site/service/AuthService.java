@@ -19,11 +19,13 @@ public class AuthService {
     private String oauth2Token;
     @Value("${server.auth.ping}")
     private String authServicePing;
+    @Value("${server.auth}")
+    private String urlAuth;
 
     public UserInfoDTO userInfo(String token) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(new RestAuthCall(
-                "http://localhost:9900/person/current"
+                 urlAuth + "/person/current"
         ).get(token), UserInfoDTO.class);
     }
 
