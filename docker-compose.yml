@@ -3,7 +3,8 @@ services:
   db_auth:
     image: postgres
     networks:
-      - my-network
+      my_network:
+        ipv4_address: 192.168.1.10
     container_name: db_auth
     environment:
       - POSTGRES_PASSWORD=password
@@ -18,21 +19,23 @@ services:
       context: ./services/auth
       dockerfile: Dockerfile
     networks:
-      - my-network
+      my_network:
+        ipv4_address: 192.168.1.11
     ports:
       - "9900:9900"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db_auth:5432/cd_auth
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
-      - SERVER_NOTIFICATION=http://job4j_notification:9920
+      - SERVER_NOTIFICATION=http://192.168.1.17:9920
     container_name: job4j_auth
     depends_on:
       - db_auth
   db_desc:
     image: postgres
     networks:
-      - my-network
+      my_network:
+        ipv4_address: 192.168.1.12
     container_name: db_desc
     environment:
       - POSTGRES_PASSWORD=password
@@ -47,21 +50,23 @@ services:
       context: ./services/desc
       dockerfile: Dockerfile
     networks:
-      - my-network
+      my_network:
+        ipv4_address: 192.168.1.13
     ports:
       - "9902:9902"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db_desc:5432/cd_desc
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
-      - SERVER_NOTIFICATION=http://job4j_notification:9920
+      - SERVER_NOTIFICATION=http://192.168.1.17:9920
     container_name: job4j_desc
     depends_on:
       - db_desc
   db_mock:
     image: postgres
     networks:
-      - my-network
+      my_network:
+        ipv4_address: 192.168.1.14
     container_name: db_mock
     environment:
       - POSTGRES_PASSWORD=password
@@ -76,21 +81,23 @@ services:
       context: ./services/mock
       dockerfile: Dockerfile
     networks:
-      - my-network
+      my_network:
+        ipv4_address: 192.168.1.15
     ports:
       - "9912:9912"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db_mock:5432/mock
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
-      - SERVER_NOTIFICATION=http://job4j_notification:9920
+      - SERVER_NOTIFICATION=http://192.168.1.17:9920
     container_name: job4j_mock
     depends_on:
       - db_mock
   db_notification:
     image: postgres
     networks:
-      - my-network
+      my_network:
+        ipv4_address: 192.168.1.16
     container_name: db_notification
     environment:
       - POSTGRES_PASSWORD=password
@@ -105,15 +112,16 @@ services:
       context: ./services/notification
       dockerfile: Dockerfile
     networks:
-      - my-network
+      my_network:
+        ipv4_address: 192.168.1.17
     ports:
       - "9920:9920"
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db_notification:5432/cd_notification
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=password
-      - SERVER_AUTH=http://job4j_auth:9900
-      - SERVER_SITE_URL_LOGIN=http://job4j_site:8080/login
+      - SERVER_AUTH=http://192.168.1.11:9900
+      - SERVER_SITE_URL_LOGIN=http://192.168.1.18:8080/login
     container_name: job4j_notification
     depends_on:
       - db_notification
@@ -122,17 +130,18 @@ services:
       context: ./services/site
       dockerfile: Dockerfile
     networks:
-      - my-network
+      my_network:
+        ipv4_address: 192.168.1.18
     ports:
       - "8080:8080"
     environment:
-      - SECURITY_OAUTH2_TOKENURI=http://job4j_auth:9900/oauth/token
-      - SECURITY_OAUTH2_RESOURCE_USERINFOURI=http://job4j_auth:9900/user
-      - SERVER_AUTH=http://job4j_auth:9900
-      - SERVER_AUTH_PING=http://job4j_auth:9900/ping
-      - SERVICE_MOCK=http://job4j_mock:9912
-      - SERVICE_DESC=http://job4j_desc:9902
-      - SERVER_NOTIFICATION=http://job4j_notification:9920
+      - SECURITY_OAUTH2_TOKENURI=http://192.168.1.11:9900/oauth/token
+      - SECURITY_OAUTH2_RESOURCE_USERINFOURI=http://192.168.1.11:9900/user
+      - SERVER_AUTH=http://192.168.1.11:9900
+      - SERVER_AUTH_PING=http://192.168.1.11:9900/ping
+      - SERVICE_MOCK=http://192.168.1.15:9912
+      - SERVICE_DESC=http://192.168.1.13:9902
+      - SERVER_NOTIFICATION=http://192.168.1.17:9920
     container_name: job4j_site
     depends_on:
       - job4j_notification
@@ -140,5 +149,8 @@ services:
       - job4j_desc
       - job4j_auth
 networks:
-  my-network:
+  my_network:
     driver: bridge
+    ipam:
+      config:
+        - subnet: 192.168.1.0/24
