@@ -1,0 +1,144 @@
+version: "2.27.0"
+services:
+  db_auth:
+    image: postgres
+    networks:
+      - my_network
+    container_name: db_auth
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=cd_auth
+      - PGDATA=/var/lib/postgresql/data_auth
+    volumes:
+      - ./db/data_auth:/var/lib/postgresql/data_auth
+    restart: always
+  auth:
+    build:
+      context: ./services/auth
+      dockerfile: Dockerfile
+    networks:
+      - my_network
+    ports:
+      - "9900:9900"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db_auth:5432/cd_auth
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SERVER_NOTIFICATION=http://notification:9920
+    container_name: auth
+    depends_on:
+      - db_auth
+  db_desc:
+    image: postgres
+    networks:
+      - my_network
+    container_name: db_desc
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=cd_desc
+      - PGDATA=/var/lib/postgresql/data_desc
+    volumes:
+      - ./db/data_desc:/var/lib/postgresql/data_desc
+    restart: always
+  desc:
+    build:
+      context: ./services/desc
+      dockerfile: Dockerfile
+    networks:
+      - my_network
+    ports:
+      - "9902:9902"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db_desc:5432/cd_desc
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SERVER_NOTIFICATION=http://notification:9920
+    container_name: desc
+    depends_on:
+      - db_desc
+  db_mock:
+    image: postgres
+    networks:
+      - my_network
+    container_name: db_mock
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=mock
+      - PGDATA=/var/lib/postgresql/data_mock
+    volumes:
+      - ./db/data_mock:/var/lib/postgresql/data_mock
+    restart: always
+  mock:
+    build:
+      context: ./services/mock
+      dockerfile: Dockerfile
+    networks:
+      - my_network
+    ports:
+      - "9912:9912"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db_mock:5432/mock
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SERVER_NOTIFICATION=notification:9920
+    container_name: mock
+    depends_on:
+      - db_mock
+  db_notification:
+    image: postgres
+    networks:
+      - my_network
+    container_name: db_notification
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=cd_notification
+      - PGDATA=/var/lib/postgresql/data_notification
+    volumes:
+      - ./db/data_notification:/var/lib/postgresql/data_notification
+    restart: always
+  notification:
+    build:
+      context: ./services/notification
+      dockerfile: Dockerfile
+    networks:
+      - my_network
+    ports:
+      - "9920:9920"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db_notification:5432/cd_notification
+      - SPRING_DATASOURCE_USERNAME=postgres
+      - SPRING_DATASOURCE_PASSWORD=password
+      - SERVER_AUTH=http://auth:9900
+      - SERVER_SITE_URL_LOGIN=http://site:8080/login
+    container_name: notification
+    depends_on:
+      - db_notification
+  site:
+    build:
+      context: ./services/site
+      dockerfile: Dockerfile
+    networks:
+      - my_network
+    ports:
+      - "8080:8080"
+    environment:
+      - SECURITY_OAUTH2_TOKENURI=http://auth:9900/oauth/token
+      - SECURITY_OAUTH2_RESOURCE_USERINFOURI=http://auth:9900/user
+      - SERVER_AUTH=http://auth:9900
+      - SERVER_AUTH_PING=http://auth:9900/ping
+      - SERVICE_MOCK=http://mock:9912
+      - SERVICE_DESC=http://desc:9902
+      - SERVER_NOTIFICATION=http://notification:9920
+    container_name: site
+    depends_on:
+      - notification
+      - mock
+      - desc
+      - auth
+networks:
+  my_network:
+    driver: bridge
