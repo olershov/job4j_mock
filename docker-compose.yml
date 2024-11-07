@@ -10,6 +10,11 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=cd_auth
       - PGDATA=/var/lib/postgresql/data_auth
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - ./db/data_auth:/var/lib/postgresql/data_auth
     restart: always
@@ -28,7 +33,8 @@ services:
       - SERVER_NOTIFICATION=http://notification:9920
     container_name: auth
     depends_on:
-      - db_auth
+      db_auth:
+        condition: service_healthy
   db_desc:
     image: postgres
     networks:
@@ -39,6 +45,11 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=cd_desc
       - PGDATA=/var/lib/postgresql/data_desc
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - ./db/data_desc:/var/lib/postgresql/data_desc
     restart: always
@@ -57,7 +68,8 @@ services:
       - SERVER_NOTIFICATION=http://notification:9920
     container_name: desc
     depends_on:
-      - db_desc
+      db_desc:
+        condition: service_healthy
   db_mock:
     image: postgres
     networks:
@@ -68,6 +80,11 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=mock
       - PGDATA=/var/lib/postgresql/data_mock
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - ./db/data_mock:/var/lib/postgresql/data_mock
     restart: always
@@ -86,7 +103,8 @@ services:
       - SERVER_NOTIFICATION=notification:9920
     container_name: mock
     depends_on:
-      - db_mock
+      db_mock:
+        condition: service_healthy
   db_notification:
     image: postgres
     networks:
@@ -97,6 +115,11 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_DB=cd_notification
       - PGDATA=/var/lib/postgresql/data_notification
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     volumes:
       - ./db/data_notification:/var/lib/postgresql/data_notification
     restart: always
@@ -116,7 +139,8 @@ services:
       - SERVER_SITE_URL_LOGIN=http://site:8080/login
     container_name: notification
     depends_on:
-      - db_notification
+      db_notification:
+        condition: service_healthy
   site:
     build:
       context: ./services/site
